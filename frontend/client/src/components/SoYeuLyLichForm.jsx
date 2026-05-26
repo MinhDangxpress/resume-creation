@@ -58,10 +58,57 @@ export default function SoYeuLyLichForm() {
   /* =====================================
      HANDLE CHANGE
   ===================================== */
+  // const handleChange = (e) => {
+  //   setForm((prev) => ({
+  //     ...prev,
+  //     [e.target.name]: e.target.value,
+  //   }));
+  // };
+  const normalizeText = (value) => {
+  if (!value) return "";
+
+  return value
+    .trimStart()
+    .toLowerCase()
+    .split(" ")
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() +
+        word.slice(1)
+    )
+    .join(" ");
+};
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // 🎯 Các field cần auto format
+    const autoFormatFields = [
+      "fullName",
+      "birthPlace",
+      "origin",
+      "address",
+
+      "father_name",
+      "father_address",
+
+      "mother_name",
+      "mother_address",
+
+      "sibling1_name",
+
+      "sibling2_name",
+
+      "sibling3_name",
+      "sibling3_job",
+
+      "sibling4_name",
+    ];
+
     setForm((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: autoFormatFields.includes(name)
+        ? normalizeText(value)
+        : value.trimStart(),
     }));
   };
 
@@ -472,7 +519,7 @@ export default function SoYeuLyLichForm() {
           <h3>Anh chị em ruột</h3>
 
           {/* ===== NGƯỜI 1 ===== */}
-          <div className="grid">
+          <div className="grid" style={{ marginBottom: "25px" }}>
 
             <FormInput
               label="Họ tên anh/chị/em 1"
@@ -498,7 +545,7 @@ export default function SoYeuLyLichForm() {
           </div>
 
           {/* ===== NGƯỜI 2 ===== */}
-          <div className="grid">
+          <div className="grid" style={{ marginBottom: "25px" }}>
 
             <FormInput
               label="Họ tên anh/chị/em 2"
@@ -524,7 +571,7 @@ export default function SoYeuLyLichForm() {
           </div>
 
           {/* ===== NGƯỜI 3 ===== */}
-          <div className="grid">
+          <div className="grid" style={{ marginBottom: "25px" }}>
 
             <FormInput
               label="Họ tên anh/chị/em 3"

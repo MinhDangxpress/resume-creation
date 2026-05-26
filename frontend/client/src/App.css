@@ -90,33 +90,8 @@ button:hover {
   background: #2980b9;
 }
 
-.sibling-box {
-  display: grid;
-  grid-template-columns: 2fr 1fr 2fr 100px;
-  gap: 10px;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  align-items: center;
-}
-
-.sibling-index {
-  font-weight: bold;
-  text-align: center;
-}
-
-.sibling-box input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.btn-remove {
-  height: 100%;
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.grid {
+  gap: 4px;
 }
 
 .btn-add {
