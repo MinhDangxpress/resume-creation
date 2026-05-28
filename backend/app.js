@@ -52,7 +52,7 @@ app.post("/generate-docx", async (req, res) => {
 
     /* ===== TEMPLATE DUY NHẤT ===== */
     const template = fs.readFileSync(
-      path.join(__dirname, "template", "so_yeu_ly_lich.docx")
+      path.join(__dirname, "template", "so_yeu_ly_lich_v2.docx")
     );
 
     /* ===== TRÌNH ĐỘ ===== */
