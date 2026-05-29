@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { TailSpin } from "react-loader-spinner";
 
 export default function SoYeuLyLichForm() {
   const [form, setForm] = useState({
@@ -54,34 +55,72 @@ export default function SoYeuLyLichForm() {
   });
 
   const [qrInput, setQrInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isCustomAddress, setIsCustomAddress] = useState(false);
 
-  /* =====================================
-     HANDLE CHANGE
-  ===================================== */
-  // const handleChange = (e) => {
-  //   setForm((prev) => ({
-  //     ...prev,
-  //     [e.target.name]: e.target.value,
-  //   }));
-  // };
   const normalizeText = (value) => {
-  if (!value) return "";
+    if (!value) return "";
 
-  return value
-    .trimStart()
-    .toLowerCase()
-    .split(" ")
-    .map(
-      (word) =>
-        word.charAt(0).toUpperCase() +
-        word.slice(1)
-    )
-    .join(" ");
-};
+    return value
+      .trimStart()
+      .toLowerCase()
+      .split(" ")
+      .map(
+        (word) =>
+          word.charAt(0).toUpperCase() +
+          word.slice(1)
+      )
+      .join(" ");
+  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   const autoFormatFields = [
+  //     "fullName",
+  //     "birthPlace",
+  //     "origin",
+  //     "address",
+
+  //     "father_name",
+  //     "father_address",
+
+  //     "mother_name",
+  //     "mother_address",
+
+  //     "sibling1_name",
+
+  //     "sibling2_name",
+
+  //     "sibling3_name",
+
+  //     "sibling4_name",
+  //   ];
+
+  //   setForm((prev) => {
+  //     const formattedValue = autoFormatFields.includes(name)
+  //       ? normalizeText(value)
+  //       : value.trimStart();
+
+  //     if (name === "origin") {
+  //       return {
+  //         ...prev,
+
+  //         origin: formattedValue,
+
+  //         father_address: formattedValue,
+  //         mother_address: formattedValue,
+  //       };
+  //     }
+
+  //     return {
+  //       ...prev,
+  //       [name]: formattedValue,
+  //     };
+  //   });
+  // };
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // 🎯 Các field cần auto format
     const autoFormatFields = [
       "fullName",
       "birthPlace",
@@ -95,26 +134,40 @@ export default function SoYeuLyLichForm() {
       "mother_address",
 
       "sibling1_name",
-
       "sibling2_name",
-
       "sibling3_name",
-      "sibling3_job",
-
       "sibling4_name",
     ];
 
+    const formattedValue = autoFormatFields.includes(name)
+      ? normalizeText(value)
+      : value.trimStart();
+
+    // 🎯 user tự sửa địa chỉ cha/mẹ
+    if (
+      name === "father_address" ||
+      name === "mother_address"
+    ) {
+      setIsCustomAddress(true);
+    }
+
     setForm((prev) => ({
       ...prev,
-      [name]: autoFormatFields.includes(name)
-        ? normalizeText(value)
-        : value.trimStart(),
+      [name]: formattedValue,
     }));
   };
+  useEffect(() => {
+  if (!form.origin) return;
 
-  /* =====================================
-     FORMAT DATE
-  ===================================== */
+  // 🎯 nếu user chưa custom
+  if (!isCustomAddress) {
+    setForm((prev) => ({
+      ...prev,
+      father_address: prev.origin,
+      mother_address: prev.origin,
+    }));
+  }
+}, [form.origin, isCustomAddress]);
   const formatDate = (str) => {
     if (!str) return "";
 
@@ -129,9 +182,6 @@ export default function SoYeuLyLichForm() {
     return str;
   };
 
-  /* =====================================
-     PARSE QR CCCD
-  ===================================== */
   const parseQR = (text) => {
     const parts = text.split("|");
 
@@ -151,9 +201,6 @@ export default function SoYeuLyLichForm() {
     };
   };
 
-  /* =====================================
-     HANDLE QR INPUT
-  ===================================== */
   const handleQRInput = (e) => {
     const value = e.target.value;
 
@@ -169,13 +216,11 @@ export default function SoYeuLyLichForm() {
     }));
   };
 
-  /* =====================================
-     SUBMIT
-  ===================================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      setLoading(true);
       const isCollege =
         form.educationType === "college";
 
@@ -206,10 +251,8 @@ export default function SoYeuLyLichForm() {
       const payload = {
         ...form,
 
-        // 🎯 THÊM DÒNG NÀY → FIX LỖI
         siblings,
 
-        // 🎯 ĐỒNG BỘ BACKEND
         thpt: isCollege
           ? form.thpt?.trim() || ""
           : " ",
@@ -233,6 +276,8 @@ export default function SoYeuLyLichForm() {
 
       const safeName = form.fullName
         ?.normalize("NFD")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/\s+/g, "_")
         .replace(/[^a-zA-Z0-9_]/g, "");
@@ -246,6 +291,8 @@ export default function SoYeuLyLichForm() {
     } catch (err) {
       console.error(err);
       alert("Lỗi tạo file");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -291,9 +338,6 @@ export default function SoYeuLyLichForm() {
           </select>
         </div>
 
-        {/* =====================================
-            QR CCCD
-        ===================================== */}
         <div className="section qr-box">
           <h3>Nhập mã QR CCCD</h3>
 
@@ -304,9 +348,6 @@ export default function SoYeuLyLichForm() {
           />
         </div>
 
-        {/* =====================================
-            THÔNG TIN CÁ NHÂN
-        ===================================== */}
         <div className="section">
           <h3>Thông tin cá nhân</h3>
 
@@ -400,9 +441,6 @@ export default function SoYeuLyLichForm() {
           </div>
         </div>
 
-        {/* =====================================
-            HỌC VẤN
-        ===================================== */}
         <div className="section">
           <h3>Học vấn</h3>
 
@@ -434,9 +472,6 @@ export default function SoYeuLyLichForm() {
           </div>
         </div>
 
-        {/* =====================================
-            CHA
-        ===================================== */}
         <div className="section">
           <h3>Thông tin Cha</h3>
 
@@ -473,9 +508,6 @@ export default function SoYeuLyLichForm() {
           </div>
         </div>
 
-        {/* =====================================
-            MẸ
-        ===================================== */}
         <div className="section">
           <h3>Thông tin Mẹ</h3>
 
@@ -512,13 +544,10 @@ export default function SoYeuLyLichForm() {
           </div>
         </div>
 
-        {/* =====================================
-            ANH CHỊ EM
-        ===================================== */}
+
         <div className="section">
           <h3>Anh chị em ruột</h3>
 
-          {/* ===== NGƯỜI 1 ===== */}
           <div className="grid" style={{ marginBottom: "25px" }}>
 
             <FormInput
@@ -544,7 +573,6 @@ export default function SoYeuLyLichForm() {
 
           </div>
 
-          {/* ===== NGƯỜI 2 ===== */}
           <div className="grid" style={{ marginBottom: "25px" }}>
 
             <FormInput
@@ -570,7 +598,6 @@ export default function SoYeuLyLichForm() {
 
           </div>
 
-          {/* ===== NGƯỜI 3 ===== */}
           <div className="grid" style={{ marginBottom: "25px" }}>
 
             <FormInput
@@ -596,7 +623,6 @@ export default function SoYeuLyLichForm() {
 
           </div>
 
-          {/* ===== NGƯỜI 4 ===== */}
           <div className="grid">
 
             <FormInput
@@ -631,13 +657,25 @@ export default function SoYeuLyLichForm() {
         </button>
 
       </form>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-modal">
+
+            <TailSpin
+              height={60}
+              width={60}
+              color="#2563eb"
+              ariaLabel="loading"
+            />
+
+            <p>Đang tạo file DOCX...</p>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-/* =====================================
-   COMPONENTS
-===================================== */
 
 const FormInput = ({
   label,

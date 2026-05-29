@@ -147,6 +147,54 @@ button:hover {
   background: white;
   font-size: 14px;
 }
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+
+  backdrop-filter: blur(3px);
+}
+
+.loading-modal {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.15);
+
+  animation: popup .2s ease;
+}
+
+.loading-modal p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@keyframes popup {
+  from {
+    transform: scale(.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .grid {
