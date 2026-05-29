@@ -338,15 +338,34 @@ export default function SoYeuLyLichForm() {
           </select>
         </div>
 
-        <div className="section qr-box">
-          <h3>Nhập mã QR CCCD</h3>
+<div className="section qr-box">
 
-          <textarea
-            value={qrInput}
-            onChange={handleQRInput}
-            placeholder="Dán chuỗi QR tại đây..."
-          />
-        </div>
+  <div className="qr-header">
+
+    <h3>Nhập mã QR CCCD</h3>
+
+    <a
+      href="https://www.qrcodegadget.com/qr-decoder/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="qr-link-btn"
+    >
+      Lấy chuỗi QR
+    </a>
+
+  </div>
+
+  <textarea
+    value={qrInput}
+    onChange={handleQRInput}
+    placeholder="Dán chuỗi QR tại đây..."
+  />
+
+  <p className="qr-note">
+    Quét QR của CCCD để lấy chuỗi rồi dán mã vào ô trên
+  </p>
+
+</div>
 
         <div className="section">
           <h3>Thông tin cá nhân</h3>
